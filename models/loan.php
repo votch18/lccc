@@ -25,6 +25,30 @@ class Loan extends Model{
         return $this->db->query($sql);
     }
 
+     //get all loans
+     public function getPendingLoans(){
+
+        $sql = "SELECT 
+                b.loan_id,
+                a.member_id, 
+                concat(a.lname, ', ', a.fname, ' ', a.extn, ' ', a.mname) as name,
+                b.principal,
+                (SELECT description FROM l_terms x WHERE x.lid = b.terms) as terms,
+                (SELECT description FROM l_funds x WHERE x.lid = b.fund_id) as type,
+                (SELECT description FROM l_interest_type x WHERE x.lid = b.interest_type) as interest_type,
+                b.deductions,
+                b.monthly,
+                b.net_proceed,
+                (b.amount_payable - (SELECT SUM(x.amount) FROM t_payments x WHERE x.loan_id = b.loan_id AND x.member_id = b.member_id)) as balance,
+                (CASE WHEN b.status = 0 THEN 'PENDING' ELSE 'APPROVED' END) as status
+                FROM t_loans b INNER JOIN t_members a on b.member_id = a.member_id 
+                WHERE a.is_active = 1 AND b.status = 0
+                GROUP BY b.loan_id
+                ";
+
+        return $this->db->query($sql);
+    }
+
     //search loans
     public function searchLoans($query){
 

@@ -25,10 +25,21 @@
             </li>
 
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Loans">
-                <a class="nav-link" href="/admin/loans/">
-                    <i class="fa fa-fw fa-bank"></i>
+                <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseLoans" data-parent="#exampleAccordion">
+                <i class="fa fa-fw fa-bank"></i>
                     <span class="nav-link-text">Loans</span>
                 </a>
+                <ul class="sidenav-second-level collapse" id="collapseLoans">
+                    <li>
+                        <a href="/admin/loans/new/">New</a>
+                    </li>
+                    <li>
+                        <a href="/admin/loans/">Approved Loans</a>
+                    </li>
+                    <li>
+                    <a href="/admin/loans/pending/">Pending Loans</a>
+                    </li>
+                </ul>
             </li>
 
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Payment">

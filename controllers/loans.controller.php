@@ -20,6 +20,20 @@ class LoansController extends Controller{
 
     }
 
+    public function admin_pending(){
+        if( $_POST ){
+            if($this->model->save($_POST)){
+                Router::redirect('/admin/loans/');
+            } else {
+                Session::setFlash("<strong>Oh Snap!</strong> This!");
+            }
+        }
+
+        $this->data['data'] = $this->model->getPendingLoans();
+
+    }
+
+
     public function admin_search(){
         if($_POST){
             $this->data['data'] = $this->model->searchLoans($_POST['search']);
