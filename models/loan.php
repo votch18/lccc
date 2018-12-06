@@ -220,30 +220,12 @@ class Loan extends Model{
 					'interest' => $interest,
 					'interest_type' => $interest_type,
 					'interest_term' => $interest_term
-				);
-        $monthly = self::getMonthlyPayments($data);
-		$amount_payable = $monthly * $terms;
-		
-        $userid = Session::get('userid');
-
-        //validate redundant loan {invalid}
-        //if (self::validateLoan($member_id, $fund_id))  return false;
-
-        //add schedule of payments
-		$data = array(
-					'member_id' => $member_id,
-					'loan_id' => $loan_id,
-					'terms' => $terms,
-					'monthly' => $monthly,
-					'date_approved' => $date_approved,
-					'amount_payable' => $amount_payable,
-					'principal' => $principal,
-					'interest' => $interest,
-					'interest_type' => $interest_type,
-					'interest_term' => $interest_term				
                 );
                 
-		//self::addScheduleofPayments($data);
+        $monthly = self::getMonthlyPayments($data);
+		$amount_payable = self::getAmountPayable($data);
+		
+        $userid = Session::get('userid');
        
         if (!$id){
             $sql = "insert into `t_loans`
@@ -338,64 +320,7 @@ class Loan extends Model{
      * @param array $data
      * @return array
      */
-    public function addScheduleofPayments($data){
-
-        $result = array();
-
-		$member_id = $data['member_id'];
-		$loan_id = $data['loan_id'];
-		$terms = $data['terms'];
-		$monthly = $data['monthly'];
-		$date_approved = $data['date_approved'];
-		$amount_payable = $data['amount_payable'];
-        $principal = $data['principal'];
-		$interest = $data['interest'];
-		$interest_type = $data['interest_type'];
-		$interest_term = $data['interest_term'];
-		
-		$accommulatedInterest = 0;
-        $runningBalance = $amount_payable;
-        $runningPrincipal = $principal;
-		
-		$monthlyrate = 0;
-		$monthly_principal = 0;
-		$monthly_interest = 0;
-		
-
-        for ($x = 1; $x <= $terms; $x++){
-		
-			if($interest_type == 1){ 	//flat interest rate
-				$monthlyrate = ((($terms / $interest_term) * $interest) / 100);
-				$monthly_principal = round(($principal / $terms), 2);
-                $interestPerMonth = round(($amount_payable / $terms) - $monthly_principal, 2);
-			}else {				        //diminishing interest rate
-				$monthlyrate = (($terms / $interest_term) * $interest / 100) / $terms;
-				$interestPerMonth = round($runningPrincipal * $monthlyrate, 2);
-				$monthly_principal = round(($amount_payable / $terms) - $interestPerMonth, 2);
-                $accommulatedInterest += round($interestPerMonth, 2);               
-            }
-            
-            $runningBalance -=  $monthly;
-            $runningPrincipal -= $monthly_principal;
-        
-            $sql = "insert into `t_schedule_of_payments`
-            set
-            `loan_id`='{$loan_id}',
-            `member_id`='{$member_id}',
-            `period`='{$x}',
-            `date_due`=DATE_ADD(DATE('{$date_approved}'), INTERVAL {$x} MONTH),
-            `amortization`='{$monthly}',
-            `principal` = '{$monthly_principal}',
-            `interest` = '{$interestPerMonth}'
-            ";
-    
-            $this->db->query($sql);
-            
-        }
-
-        return  $result;
-    }
-
+   
     /**
      * Show schedule of payment
      * @param array $data
@@ -493,7 +418,29 @@ class Loan extends Model{
 		}
 		
 		return round($monthly, 2);
-	}
+    }
+    
+    public function getAmountPayable($data){
+	
+		$principal = $data['principal'];
+		$terms = $data['terms'];
+		$interest = $data['interest'];
+		$interest_type = $data['interest_type'];
+		$interest_term = $data['interest_term'];
+		
+		$amount_payable = 0;
+		
+		if($interest_type == 1){ 	        //flat interest rate
+			$interest = ((($terms / $interest_term) * $interest) / 100);
+			$amount_payable = ($principal + ($principal * $interest));
+		}else {				                //diminishing interest rate
+			$interest = (($terms / $interest_term) * $interest / 100) / $terms;
+			$amount_payable = (self::PMT($interest, $terms, $principal, 0, 0)) * $terms;
+		}
+		
+		return round($amount_payable, 2);
+    }
+
 	
 	public function saveDeductions($data){
 	
