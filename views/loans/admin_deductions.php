@@ -45,6 +45,21 @@
 					<div class="col-md-6">
 						<div class="row mt-3">
 							<div class="col-sm-5">
+								<label for="deduction_type">Type</label>
+							</div>
+							<div class="col-sm-5">
+								<select name="deduction_type" class="form-control" required="">							
+									<option value="1" >Deduction</option>
+									<option value="2" >Add-on</option>
+								</select>
+							</div>
+							<div class="col-sm-2">
+								
+							</div>
+						</div>
+
+						<div class="row mt-3">
+							<div class="col-sm-5">
 								<label for="advance_interest">Advance Interest</label>
 							</div>
 							<div class="col-sm-5">
@@ -145,8 +160,6 @@
 								<a href="#" class="btn btn-danger btn-sm" id="btnRemoveCBU"><i class="fa fa-minus"></i></a>
 							</div>
 						</div>
-						
-					
 					</div>
 					
 					
