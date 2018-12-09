@@ -37,6 +37,8 @@ class LoansController extends Controller{
     public function admin_search(){
         if($_POST){
             $this->data['data'] = $this->model->searchLoans($_POST['search']);
+        }else{
+            $this->data['data'] = array();
         }
     }
 

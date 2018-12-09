@@ -5,45 +5,62 @@ class Member extends Model{
 
     public function getMembers(){
 
-        $sql = "select a.*,
-                (select x.description from l_gender x where x.lid=a.gender) as gender
-                from t_members a where a.is_active = 1 order by a.lname, a.fname, a.mname";
+        $sql = "SELECT a.*,
+                    (SELECT x.description FROM l_gender x WHERE x.lid=a.gender) as gender
+                    FROM t_members a 
+                    WHERE a.is_active = 1 
+                    order by a.lname, a.fname, a.mname";
 
         return $this->db->query($sql);
     }
 
     public function getDeletedMembers(){
 
-        $sql = "select a.*,
-                (select x.description from l_gender x where x.lid=a.gender) as gender
-                from t_members a where a.is_active != 1 order by a.lname, a.fname, a.mname";
+        $sql = "SELECT a.*,
+                    (select x.description from l_gender x where x.lid=a.gender) as gender
+                    from t_members a 
+                    where a.is_active != 1 
+                    order by a.lname, a.fname, a.mname";
 
         return $this->db->query($sql);
     }
 
 	public function searchMembers($name){
 
-        $sql = "select a.member_id, concat(lname, ' ', fname, ' ', mname) as name
-                from t_members a left join t_loans b on a.member_id = b.member_id where a.is_active = 1 and concat(lname, ', ', fname, ' ', mname) like '%{$name}%' limit 0, 4";
+        $sql = "SELECT 
+                    a.member_id, 
+                    concat(lname, ' ', fname, ' ', mname) as name
+                    FROM t_members a 
+                    left join t_loans b on a.member_id = b.member_id 
+                    where a.is_active = 1 and concat(lname, ', ', fname, ' ', mname) like '%{$name}%' 
+                    limit 0, 4";
 
         return $this->db->query($sql);
     }
 	
     public function getMemberswithOutLoan($name){
 
-        $sql = "select a.member_id, concat(lname, ' ', fname, ' ', mname) as name
-                from t_members a left join t_loans b on a.member_id = b.member_id where a.is_active = 1 and ifnull(b.status, 2) > 1 and concat(lname, ', ', fname, ' ', mname) like '%{$name}%' limit 0, 4";
+        $sql = "SELECT 
+                    a.member_id, 
+                    concat(lname, ' ', fname, ' ', mname) as name
+                    FROM t_members a 
+                    left join t_loans b on a.member_id = b.member_id 
+                    where a.is_active = 1 and ifnull(b.status, 2) > 1 and concat(lname, ', ', fname, ' ', mname) like '%{$name}%' 
+                    limit 0, 4";
 
         return $this->db->query($sql);
     }
 
     public function getMemberswithLoan($name){
 
-        $sql = "select 
+        $sql = "SELECT 
                 b.loan_id,
                 a.member_id, 
                 concat(lname, ' ', fname, ' ', mname) as name
-                from t_members a left join t_loans b on a.member_id = b.member_id where a.is_active = 1 and ifnull(b.status, 0) = 1 and concat(a.lname, ', ', a.fname, ' ', a.mname) like '%{$name}%' limit 0, 5";
+                from t_members a 
+                left join t_loans b on a.member_id = b.member_id 
+                where a.is_active = 1 and ifnull(b.status, 0) = 1 and concat(a.lname, ', ', a.fname, ' ', a.mname) like '%{$name}%' 
+                limit 0, 5";
 
         return $this->db->query($sql);
     }
@@ -51,34 +68,34 @@ class Member extends Model{
 
     public function getMemberById($id){
         $id = $this->db->escape($id);
-        $sql = "select 
-                a.member_id,
-                a.lname,
-                a.fname,
-                a.mname,
-                a.extn,
-                a.civil_status,
-                a.citizenship,
-                a.source_of_income,
-                a.mobile,
-                a.img,
-                a.spouse_lname,
-                a.spouse_fname,        
-                (select x.description from l_gender x where x.lid = a.gender) as gender,
-                (DATEDIFF(NOW(), a.birthdate)/365.25) as age,
-                concat(
-                    purok, ', ',
-                    b.barangay, ', ',
-                    c.description, ', ',
-                    d.province
-                ) as address,
-                concat(a.lname, ', ', a.fname, ' ', a.mname) as name 
-                from t_members a
-                left join l_barangay b on b.lid = a.brgy
-                left join l_municipality c on c.lid = a.municipality
-                left join l_province d on d.lid = a.province
-                where a.member_id ='{$id}' 
-                limit 1";
+        $sql = "SELECT 
+                    a.member_id,
+                    a.lname,
+                    a.fname,
+                    a.mname,
+                    a.extn,
+                    a.civil_status,
+                    a.citizenship,
+                    a.source_of_income,
+                    a.mobile,
+                    a.img,
+                    a.spouse_lname,
+                    a.spouse_fname,        
+                    (select x.description from l_gender x where x.lid = a.gender) as gender,
+                    (DATEDIFF(NOW(), a.birthdate)/365.25) as age,
+                    concat(
+                        purok, ', ',
+                        b.barangay, ', ',
+                        c.description, ', ',
+                        d.province
+                    ) as address,
+                    concat(a.lname, ', ', a.fname, ' ', a.mname) as name 
+                    FROM t_members a
+                    LEFT JOIN l_barangay b on b.lid = a.brgy
+                    LEFT JOIN l_municipality c on c.lid = a.municipality
+                    LEFT JOIN l_province d on d.lid = a.province
+                    WHERE a.member_id ='{$id}' 
+                    LIMIT 1";
 
         $result = $this->db->query($sql);
         if (isset($result[0])){
@@ -89,11 +106,10 @@ class Member extends Model{
 
     public function getMemberDataById($id){
         $id = $this->db->escape($id);
-        $sql = "select 
-                *
-                from t_members a
-                where a.member_id ='{$id}' 
-                limit 1";
+        $sql = "SELECT *
+                    FROM t_members a
+                    WHERE a.member_id ='{$id}' 
+                    LIMIT 1";
 
         $result = $this->db->query($sql);
         if (isset($result[0])){
@@ -151,7 +167,7 @@ class Member extends Model{
             }
 
 
-            $sql = "insert into `t_members` set
+            $sql = "INSERT INTO `t_members` SET
                 `member_id`='{$member_id}',
                 `lname`='{$lname}',
                 `fname`='{$fname}',
@@ -175,9 +191,8 @@ class Member extends Model{
             $log = new Log();
             $log->save('Add new member: '.$lname.', '.$fname.' '.$mname );
         }else {
-             $sql = "update `t_members`
-                 set
-                `member_id`='{$member_id}',
+             $sql = "UPDATE `t_members`
+                 SET
                 `lname`='{$lname}',
                 `fname`='{$fname}',
                 `mname`='{$mname}',
@@ -193,10 +208,8 @@ class Member extends Model{
                 `province`='{$province}',
                 `spouse_lname`='{$spouse_lname}',
                 `spouse_fname`='{$spouse_fname}'
-                where member_id = '{$id}'
+                WHERE member_id = '{$id}'
                 ";
-
-
         }
 
         return $this->db->query($sql);
@@ -204,10 +217,10 @@ class Member extends Model{
 
     public function checkMember($lname, $fname, $mname){
 
-        $sql = "select *
-                    from t_members a
-                    where
-                    a.lname ='{$lname}' and a.fname = '{$fname}' and a.mname = '{$mname}'";
+        $sql = "SELECT *
+                    FROM t_members a
+                    WHERE
+                    a.lname ='{$lname}' AND a.fname = '{$fname}' AND a.mname = '{$mname}'";
 
         $result = $this->db->query($sql);
         if (isset($result[0])){
@@ -278,7 +291,7 @@ class Member extends Model{
                 return false;
             }
 
-            $sql = "UPDATE `t_memebrs` SET
+            $sql = "UPDATE `t_members` SET
             `img`='{$new_filename}'
             WHERE id ='{$id}'
             ";

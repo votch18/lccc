@@ -27,6 +27,7 @@
                         <th>Terms</th>
                         <th>Principal</th>
                         <th>Monthly</th>
+                        <th>Balance</th>
                         <th>Status</th>
                         <th style="width: 80px;">Action</th>
                     </tr>
@@ -43,7 +44,7 @@
                             <td style="text-align: right;"><?=Util::n_format($res['principal']) ?></td>
                             <td style="text-align: right;"><?=Util::n_format($res['monthly']) ?></td> 
                             <td style="text-align: right;"><?=Util::n_format($res['balance']) ?></td> 
-
+                            <td style="text-align: center;"><span class="btn btn-info"><?=$res['status'] ?></span></td> 
                             <td>
                                 <a href="/admin/loans/schedule/<?=$res['loan_id']?>/<?=$res['member_id']?>" title="View" class="btn btn-primary btn-xs"><i class="fa fa-eye fa-lg"></i></a>
                                 <a href="/admin/loans/delete/<?=$res['loan_id']?>" title="Delete" class="btn btn-danger btn-xs btn-delete"><i class="fa fa-trash-o fa-lg"></i></a>

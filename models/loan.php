@@ -13,12 +13,12 @@ class Loan extends Model{
                 (SELECT description FROM l_funds x WHERE x.lid = b.fund_id) as type,
                 (SELECT description FROM l_interest_type x WHERE x.lid = b.interest_type) as interest_type,
                 b.deductions,
-                b.monthly,
+                (b.amount_payable / b.terms) as monthly,
                 b.net_proceed,
-                (b.amount_payable - (SELECT SUM(x.amount) FROM t_payments x WHERE x.loan_id = b.loan_id AND x.member_id = b.member_id)) as balance
-
+                (b.amount_payable - (SELECT SUM(x.amount) FROM t_payments x WHERE x.loan_id = b.loan_id AND x.member_id = b.member_id)) as balance,
+                (SELECT description FROm l_loan_status x WHERE x.lid = b.status) as status
                 FROM t_loans b INNER JOIN t_members a on b.member_id = a.member_id 
-                WHERE a.is_active = 1 AND b.status = 1
+                WHERE a.is_active = 1 AND b.status = 2
                 GROUP BY b.loan_id
                 ";
 
@@ -37,12 +37,12 @@ class Loan extends Model{
                 (SELECT description FROM l_funds x WHERE x.lid = b.fund_id) as type,
                 (SELECT description FROM l_interest_type x WHERE x.lid = b.interest_type) as interest_type,
                 b.deductions,
-                b.monthly,
+                (b.amount_payable / b.terms) as monthly,
                 b.net_proceed,
                 (b.amount_payable - (SELECT SUM(x.amount) FROM t_payments x WHERE x.loan_id = b.loan_id AND x.member_id = b.member_id)) as balance,
-                (CASE WHEN b.status = 0 THEN 'PENDING' ELSE 'APPROVED' END) as status
+                (SELECT description FROm l_loan_status x WHERE x.lid = b.status) as status
                 FROM t_loans b INNER JOIN t_members a on b.member_id = a.member_id 
-                WHERE a.is_active = 1 AND b.status = 0
+                WHERE a.is_active = 1 AND b.status = 1
                 GROUP BY b.loan_id
                 ";
 
@@ -62,8 +62,9 @@ class Loan extends Model{
                 (SELECT description FROM l_terms x WHERE x.lid = b.terms) as terms,
                 (SELECT description FROM l_funds x WHERE x.lid = b.fund_id) as type,
                 b.deductions,
-                b.monthly,
-                b.net_proceed
+                (b.amount_payable / b.terms) as monthly,
+                b.net_proceed,
+                b.status
                 FROM t_loans b 
                 INNER JOIN t_members a on b.member_id = a.member_id 
                 WHERE lname LIKE '%{$query}%' or fname LIKE '%{$query}%'
@@ -75,7 +76,9 @@ class Loan extends Model{
     //get loan details by member id
     public function getLoansById($id){
         $id = $this->db->escape($id);
-        $sql = "SELECT *
+        $sql = "SELECT  *,
+                (a.amount_payable / a.terms) as monthly,
+                DATE_ADD(DATE(a.date_approved), INTERVAL a.terms MONTH) as maturity_date  
                 FROM t_loans a 
                 INNER JOIN t_members b ON b.member_id = a.member_id 
                 WHERE a.loan_id = '{$id}'";
@@ -131,6 +134,8 @@ class Loan extends Model{
                 (SELECT x.description FROM l_interest_term x WHERE x.lid = a.interest_term) as interest_term,
                 (0) as running_total, 
                 (0) as amount,
+                (a.amount_payable / a.terms) as monthly,
+                DATE_ADD(DATE(a.date_approved), INTERVAL a.terms MONTH) as maturity_date,  
                 (a.amount_payable) as balance 
                 FROM t_loans a 
                 INNER JOIN t_members b ON b.member_id = a.member_id 
@@ -212,7 +217,7 @@ class Loan extends Model{
 		$interest = $this->db->escape($data['interest']);
 		$interest_term = $this->db->escape($data['interest_term']);
         $fund_id = $this->db->escape($data['loan_type']);
-        $status = 0;
+        $status = 1;
 
 		$data = array(
 					'principal' => $principal,
@@ -241,10 +246,8 @@ class Loan extends Model{
 				`interest_type`='{$interest_type}',
 				`interest`='{$interest}',
 				`interest_term`='{$interest_term}',
-                `monthly`='{$monthly}',
                 `deductions`='{$deductions}',
                 `net_proceed`='{$net_proceed}',  
-                `maturity_date` =  DATE_ADD(DATE('{$date_approved}'), INTERVAL {$terms} MONTH),  
                 `status`='{$status}',
                 `userid`='{$userid}'
             ";
@@ -262,7 +265,6 @@ class Loan extends Model{
 				`interest_type`='{$interest_type}',
 				`interest`='{$interest}',
 				`interest_term`='{$interest_term}',
-                `monthly`='{$monthly}',
                 `deductions`='{$deductions}',
                 `net_proceed`='{$net_proceed}',               
                 `status`='{$status}',
@@ -486,11 +488,11 @@ class Loan extends Model{
 		$loans = self::getLoansById($loan_id);
 		$net_proceed = $loans['principal']  - $total_deductions;
 		
-		 $sql = "update `t_loans`
-                set
+		 $sql = "UPDATE `t_loans`
+                SET
                 `deductions`='{$total_deductions}',
                 `net_proceed`='{$net_proceed}',               
-                `status`= 1
+                `status`= 2
                 WHERE
                 loan_id = '{$loan_id}'
             ";

@@ -122,7 +122,7 @@
         <label class="form-control-label" for="source_of_income">Source of Income</label>
     </div>
     <div class="col-md-6">
-        <input type="text" class="form-control" name="source_of_income" placeholder="Source of Income"  value="<?=$this->data['source_of_income'] ?>" required="" >
+        <input type="text" class="form-control" name="source_of_income" placeholder="Source of Income"  value="<?=$this->data['source_of_income'] ?>"  >
     </div>
     <div class="col-md-3">
     </div>

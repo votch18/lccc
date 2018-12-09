@@ -41,7 +41,7 @@
                             <td><?=$res['terms'] ?></td>
                             <td style="text-align: right;"><?=Util::n_format($res['principal']) ?></td>
                             <td style="text-align: right;"><?=Util::n_format($res['monthly']) ?></td> 
-                            <td style="text-align: right;"><?=$res['status'] ?></td> 
+                            <td style="text-align: right;"><span class="btn btn-warning"><?=$res['status'] ?></span></td> 
 
                             <td>
                                 <a href="/admin/loans/deductions/<?=$res['loan_id']?>/<?=$res['member_id']?>" title="View" class="btn btn-primary btn-xs"><i class="fa fa-arrow-right fa-lg"></i></a>

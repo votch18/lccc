@@ -4,9 +4,7 @@
     <div class="card-header">
         <i class="fa fa-table"></i> LIST OF LOANS
         <div class="pull-right">
-            <a class="btn btn-success" href="/admin/loans/new/" style="color: #ffffff;" >
-                <i class="fa fa-fw fa-bank"></i> New Loan</a>
-
+          
                <a class="btn btn-info" href="/print/loans/">
                 <i class="fa fa-fw fa-print"></i> Print</a>
         </div>
@@ -28,6 +26,7 @@
                         <th>Deductions</th>
                         <th>Net Proceed</th>
                         <th>Monthly</th>
+                        <th>Status</th>
                         <th style="width: 80px;">Action</th>
                     </tr>
 
@@ -43,8 +42,13 @@
                             <td style="text-align: right;"><?=Util::n_format($res['deductions']) ?></td>
                             <td style="text-align: right;"><?=Util::n_format($res['net_proceed']) ?></td> 
                             <td style="text-align: right;"><?=Util::n_format($res['monthly']) ?></td> 
+                            <td style="text-align: center;"><?=$res['status'] == 0 ? '<span class="btn btn-warning">PENDING</span>' : '<span class="btn btn-info">OPEN</span>' ?></td> 
                             <td>
+                            <?php if ($res['status'] == 1) {?>
                                 <a href="/admin/loans/schedule/<?=$res['loan_id']?>/<?=$res['member_id']?>" title="View" class="btn btn-primary btn-xs"><i class="fa fa-eye fa-lg"></i></a>
+                            <?php } else {?>
+                                <a href="/admin/loans/deductions/<?=$res['loan_id']?>/<?=$res['member_id']?>" title="Proceed" class="btn btn-primary btn-xs"><i class="fa fa-arrow-right fa-lg"></i></a>
+                            <?php } ?>
                                 <a href="/admin/loans/delete/<?=$res['loan_id']?>" title="Delete" class="btn btn-danger btn-xs" onclick="return confirmDelete('Are you sure you want to deactivate this account?');"><i class="fa fa-trash-o fa-lg"></i></a>
                             </td>
                         </tr>
