@@ -103,7 +103,6 @@ class LoansController extends Controller{
 		
         $this->data['member_id'] = $this->params[1];
         $this->data['loan_id'] = $this->params[0];
-		$this->data['data'] = $this->model->getLoanSchedule($this->params[0]);
 	
 		
     }

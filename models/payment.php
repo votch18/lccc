@@ -266,7 +266,7 @@ class Payment extends Model
         $sql = "SELECT 
             ((a.amount_payable) - IFNULL((SELECT SUM(x.amount) FROM t_payments x WHERE x.member_id = a.member_id AND x.loan_id = a.loan_id), 0)) as balance 
             FROM t_loans a 
-            WHERE a.member_id = '{$member_id}' and a.loan_id = '{$loan_id}' and a.status = 1";
+            WHERE a.member_id = '{$member_id}' and a.loan_id = '{$loan_id}' and a.status = 2";
 
         $result = $this->db->query($sql);
         if (isset($result[0])){

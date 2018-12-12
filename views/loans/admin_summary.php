@@ -124,7 +124,27 @@
 
                 <div class="alert alert-success mt-3">Loan Schedule</div>
 
-                <?php if (count($this->data['data']) > 0 ) { ?>
+                <?php 
+                
+                   
+                $loans = $loan->getLoansById($this->data['loan_id']);
+
+                $data = array(
+                    'member_id' => $loans['member_id'],
+                    'loan_id' => $loans['loan_id'],
+                    'terms' => $loans['terms'],
+                    'monthly' => $loans['monthly'],
+                    'date_approved' => $loans['date_approved'],
+                    'amount_payable' => $loans['amount_payable'],
+                    'principal' => $loans['principal'],
+                    'interest' => $loans['interest'],
+                    'interest_type' => $loans['interest_type'],
+                    'interest_term' => $loans['interest_term']				
+                );
+
+                $schedule = $loan->showScheduleofPayments($data);
+
+                if (count($schedule ) > 0 ) { ?>
 
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 
@@ -134,19 +154,17 @@
                         <th>Period</th>
                         <th>Date</th>
                         <th>Amount</th>
-                        <th>Amount Paid</th>
                         <th>Balance</th>
                     </tr>
                     
                     </thead>
                     <tbody>
-                    <?php foreach ($this->data['data'] as $res) { ?>
+                    <?php foreach ($schedule  as $res) { ?>
                         <tr>
                             <td><?=$res['loan_id'] ?></td>
                             <td><?=$res['period'] ?></td>
                             <td><?=Util::d_format($res['date_due']); ?></td>
                             <td style="text-align: right;"><?=Util::n_format($res['amortization']) ?></td>
-                            <td style="text-align: right;"><?=Util::n_format($res['payment']); ?></td>
                             <td style="text-align: right;"><?=Util::n_format($res['balance']); ?></td> 
                            
                         </tr>
@@ -162,101 +180,3 @@
         </div>
     </div>
 </div>
-
-
-
-<!-- Search Funds Modal-->
-<div class="modal fade pt-5" id="addPaymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form method="POST">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">PAYMENT</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-
-                <div class="modal-body p-3">
-
-                    <input type="hidden" name="member_id" id="member_id" />
-					<input type="hidden" name="loan_id" id="loan_id" />
-					<input type="hidden" name="period" id="period" />
-					<input type="hidden" name="penalty" id="penalty" />
-                    <div class="row row-sm-offset">
-				
-						<div class="col">
-                            <div class="form-group">
-                                <label for="or_no">OR No.*</label>
-                                <input type="decimal" class="form-control" name="or_no" required="" id="or_no" value="<?=Util::generateRandomCode2(8)?>" readonly>
-                            </div>
-                        </div>
-						
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="dop">Date of Payment*</label>
-                                <input type="date" class="form-control" name="dop" required="" id="dop" value="<?=date('Y-m-d', strtotime("now"))?>" >
-                            </div>
-                        </div>
-
-                    </div>
-					
-					 <div class="row row-sm-offset">
-				
-						
-                        <div class="col-xs-12 col-md-12">
-                            <div class="form-group">
-                                <label for="amount_due">Amount Due*</label>
-                                <input type="decimal" class="form-control" name="amount_due" required="" id="amount_due" value="" readonly>
-                            </div>
-                        </div>
-						
-						
-						<div class="col-xs-12 col-md-12">
-                            <div class="form-group">
-                                <label for="amount">Amount Paid*</label>
-                                <input type="decimal" class="form-control" name="amount" required="" id="amount" >
-								<small class="text-muted" id="balance"></small>
-                            </div>
-                        </div>
-
-                    </div>
-
-                
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">CANCEL</button>
-					<input type="submit" class="btn btn-primary" value="ADD PAYMENT" />
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-	
-	var bal_field = $('#balance');
-	
-	$('.pay').on('click', function(e){
-		var $loan_id = $(this).attr('id').split("-")[0];
-		var $member_id = $(this).attr('id').split("-")[1];
-		var $period = $(this).attr('id').split("-")[2];
-		var $amount = $(this).attr('id').split("-")[3];
-		
-		$('#loan_id').val($loan_id);
-		$('#member_id').val($member_id);
-		$('#period').val($period);
-		$('#amount_due').val($amount);
-		
-	});
-	
-	$('#amount').on('change keypress keyup', function (e){
-		var $balance = $('#amount_due').val() - $(this).val();
-		var keyword = ($balance < 0 ? 'Change: ' : 'Balance: ');
-		$val = ($balance < 0 ? ($balance * -1) : $balance);
-		
-		bal_field.html(keyword + $val);
-		
-	});
-	
-	</script>
