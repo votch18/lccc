@@ -36,7 +36,7 @@
                             <td style="text-align: right;"><?=Util::n_format($res['penalty']) ?></td>
                             <td>
 								<a href="/print/payments/receipt/<?=$res['payment_id']?>/" title="Print" class="btn btn-info btn-xs"><i class="fa fa-print fa-lg"></i></a>
-                                <a href="/admin/payments/edit/<?=$res['payment_id']?>/" title="View" class="btn btn-primary btn-xs"><i class="fa fa-edit fa-lg"></i></a>
+                                <!--<a href="/admin/payments/edit/<?=$res['payment_id']?>/" title="View" class="btn btn-primary btn-xs"><i class="fa fa-edit fa-lg"></i></a>-->
                                 <a href="/admin/payments/delete/<?=$res['payment_id']?>/" title="Delete" class="btn btn-danger btn-xs btn-delete" ><i class="fa fa-trash-o fa-lg"></i></a>
                             </td>
                         </tr>

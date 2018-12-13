@@ -29,7 +29,7 @@ class Payment extends Model
                 concat(b.lname, ', ', b.fname, ' ', b.extn, ' ', b.mname) as name,
 				a.date as dop,
                 a.amount,
-				(c.monthly - a.amount) as balance
+				((c.amount_payable / c.terms) - a.amount) as balance
                 from t_payments a 
 				inner join t_members b on b.member_id = a.member_id
                 inner join t_loans c on c.member_id = a.member_id and c.loan_id = a.loan_id
